@@ -7,7 +7,9 @@ public class TableController : MonoBehaviour
     [SerializeField] private GameObject pixelPref;
     [SerializeField] private Transform pixelParent;
     [SerializeField] private Transform simTableTransform;
-    [SerializeField] private int simScaleFactor = 10;
+
+    // Default value is 10 and all algorith is calculated according to this assumption
+    private int simScaleFactor = 10;
 
     private Pixel[,] _pixelArr;
 
@@ -18,7 +20,7 @@ public class TableController : MonoBehaviour
 
     private void Start()
     {
-        if(Instance != null && Instance != this)
+        if (Instance != null && Instance != this)
         {
             Destroy(this.gameObject);
         }
@@ -37,29 +39,21 @@ public class TableController : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Mouse0))
         {
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mouseWorldPos.z = 0;
+            Vector2Int tablePos = GetPositionOnTable();
 
-            // We used a 0.1x0.1 sprite as a pixel
-            int posX = (int)(mouseWorldPos.x * simScaleFactor);
-            int posY = (int)(mouseWorldPos.y * simScaleFactor);
-
-            int i = GetCoordinateValue(posX, _arrX);
-            int j = GetCoordinateValue(posY, _arrY);
-
-            if (j >= _arrY || j < 0 || i >= _arrX || i < 0)
+            if (tablePos.y >= _arrY || tablePos.y < 0 || tablePos.x >= _arrX || tablePos.x < 0)
             {
                 return;
             }
 
-            if (_pixelArr[j, i] == null)
+            if (_pixelArr[tablePos.y, tablePos.x] == null)
             {
-                GameObject go = Instantiate(pixelPref, new Vector3((float)posX / simScaleFactor, (float)posY / simScaleFactor, 0), Quaternion.identity, pixelParent);
+                GameObject go = Instantiate(pixelPref, GetFixedMousePosition(), Quaternion.identity, pixelParent);
 
-                if(go.TryGetComponent(out Pixel pixel))
+                if (go.TryGetComponent(out Pixel pixel))
                 {
-                    pixel.SetPixelData(i, j, go);
-                    _pixelArr[j, i] = pixel;
+                    pixel.SetPixelData(tablePos.x, tablePos.y, go);
+                    _pixelArr[tablePos.y, tablePos.x] = pixel;
                 }
                 else
                 {
@@ -67,27 +61,19 @@ public class TableController : MonoBehaviour
                 }
             }
         }
-        else if(Input.GetKey(KeyCode.Mouse1))
+        else if (Input.GetKey(KeyCode.Mouse1))
         {
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mouseWorldPos.z = 0;
+            Vector2Int tablePos = GetPositionOnTable();
 
-            // We used a 0.1x0.1 sprite as a pixel
-            int posX = (int)(mouseWorldPos.x * simScaleFactor);
-            int posY = (int)(mouseWorldPos.y * simScaleFactor);
-
-            int i = GetCoordinateValue(posX, _arrX);
-            int j = GetCoordinateValue(posY, _arrY);
-
-            if (j >= _arrY || j < 0 || i >= _arrX || i < 0)
+            if (tablePos.y >= _arrY || tablePos.y < 0 || tablePos.x >= _arrX || tablePos.x < 0)
             {
                 return;
             }
 
-            if (_pixelArr[j, i] != null)
+            if (_pixelArr[tablePos.y, tablePos.x] != null)
             {
-                GameObject selectedGo = _pixelArr[j, i].gameObject;
-                _pixelArr[j, i] = null;
+                GameObject selectedGo = _pixelArr[tablePos.y, tablePos.x].gameObject;
+                _pixelArr[tablePos.y, tablePos.x] = null;
 
                 Destroy(selectedGo);
             }
@@ -96,9 +82,9 @@ public class TableController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        for(int j = 0; j < _arrY; j++)
+        for (int j = 0; j < _arrY; j++)
         {
-            for(int i = 0; i < _arrX; i++)
+            for (int i = 0; i < _arrX; i++)
             {
                 if (_pixelArr[j, i] != null)
                 {
@@ -111,6 +97,20 @@ public class TableController : MonoBehaviour
                 }
             }
         }
+    }
+
+    private Vector2Int GetPositionOnTable()
+    {
+        Vector3 mouseWorldPos = GetMousePosition();
+
+        // We used a 0.1x0.1px sprite as a pixel
+        int posX = (int)(mouseWorldPos.x * simScaleFactor);
+        int posY = (int)(mouseWorldPos.y * simScaleFactor);
+
+        int i = GetCoordinateValue(posX, _arrX);
+        int j = GetCoordinateValue(posY, _arrY);
+
+        return new Vector2Int(i, j);
     }
 
     int GetCoordinateValue(int positionalValue, int arrLength)
@@ -128,6 +128,23 @@ public class TableController : MonoBehaviour
         }
 
         return coordValue;
+    }
+
+    private Vector3 GetMousePosition()
+    {
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = 0;
+        return mouseWorldPos;
+    }
+
+    private Vector3 GetFixedMousePosition()
+    {
+        // Turns 1.1125 to 1.1 by make some casting, multiplying and dividing
+        Vector3 mouseWorldPos = GetMousePosition();
+        mouseWorldPos.x = (float)((int)(mouseWorldPos.x * simScaleFactor)) / simScaleFactor;
+        mouseWorldPos.y = (float)((int)(mouseWorldPos.y * simScaleFactor)) / simScaleFactor;
+
+        return mouseWorldPos;
     }
 
     public void MovePixel(int currentX, int currentY, int targetX, int targetY)

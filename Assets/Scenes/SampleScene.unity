@@ -405,10 +405,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ccb4e3d049e7ba48a22de85b4651a23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pixelPref: {fileID: 369958778473757233, guid: aaa3014009fae944c90e42e70fe6fd5f, type: 3}
+  pixelPref: {fileID: 369958778473757233, guid: 2b7a7f6fd25befc45b64a2d603a89070, type: 3}
   pixelParent: {fileID: 746177177}
   simTableTransform: {fileID: 971527546}
-  simScaleFactor: 10
 --- !u!4 &828600623
 Transform:
   m_ObjectHideFlags: 0
