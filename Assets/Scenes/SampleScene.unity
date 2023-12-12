@@ -405,7 +405,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ccb4e3d049e7ba48a22de85b4651a23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pixelPref: {fileID: 369958778473757233, guid: 0ba06f4de5ca64741b60c99418ccca6d, type: 3}
+  pixelPref: {fileID: 369958778473757233, guid: aaa3014009fae944c90e42e70fe6fd5f, type: 3}
   pixelParent: {fileID: 746177177}
   simTableTransform: {fileID: 971527546}
   simScaleFactor: 10
@@ -502,8 +502,8 @@ Transform:
   m_GameObject: {fileID: 971527544}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.5837, y: 0, z: 0}
-  m_LocalScale: {x: 15.5, y: 8.5, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 16.5, y: 8.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1559582799}

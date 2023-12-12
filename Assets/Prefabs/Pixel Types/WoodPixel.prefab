@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8400608793484145996}
   - component: {fileID: 8056095238950221461}
-  - component: {fileID: 7728789586896140370}
+  - component: {fileID: 5875692654226934309}
   m_Layer: 0
-  m_Name: Sand Pixel
+  m_Name: WoodPixel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: f0f9d7870055460428db0b8baf14850b, type: 3}
-  m_Color: {r: 0.83137256, g: 0.80784315, b: 0.44313726, a: 1}
+  m_Color: {r: 0.4528302, g: 0.31072137, b: 0.087148435, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -85,7 +85,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7728789586896140370
+--- !u!114 &5875692654226934309
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,11 +94,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 369958778473757233}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 655b1ee91a430234eba5ec74b04d1a88, type: 3}
+  m_Script: {fileID: 11500000, guid: 8e74afab2f631b44bab4563083eeb064, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 0
-  colors:
-  - {r: 0.83137256, g: 0.80784315, b: 0.44313726, a: 1}
-  - {r: 0.8235294, g: 0.8156863, b: 0.44313726, a: 1}
-  - {r: 0.84313726, g: 0.7921569, b: 0.44313726, a: 1}
+  type: 3

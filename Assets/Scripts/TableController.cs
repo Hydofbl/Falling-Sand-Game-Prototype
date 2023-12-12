@@ -58,13 +58,38 @@ public class TableController : MonoBehaviour
 
                 if(go.TryGetComponent(out Pixel pixel))
                 {
-                    pixel.SetDatas(i, j, go);
+                    pixel.SetPixelData(i, j, go);
                     _pixelArr[j, i] = pixel;
                 }
                 else
                 {
                     Destroy(go);
                 }
+            }
+        }
+        else if(Input.GetKey(KeyCode.Mouse1))
+        {
+            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mouseWorldPos.z = 0;
+
+            // We used a 0.1x0.1 sprite as a pixel
+            int posX = (int)(mouseWorldPos.x * simScaleFactor);
+            int posY = (int)(mouseWorldPos.y * simScaleFactor);
+
+            int i = GetCoordinateValue(posX, _arrX);
+            int j = GetCoordinateValue(posY, _arrY);
+
+            if (j >= _arrY || j < 0 || i >= _arrX || i < 0)
+            {
+                return;
+            }
+
+            if (_pixelArr[j, i] != null)
+            {
+                GameObject selectedGo = _pixelArr[j, i].gameObject;
+                _pixelArr[j, i] = null;
+
+                Destroy(selectedGo);
             }
         }
     }
@@ -117,6 +142,27 @@ public class TableController : MonoBehaviour
         _pixelArr[targetY, targetX] = _pixelArr[currentY, currentX];
         _pixelArr[currentY, currentX] = null;
 
-        _pixelArr[targetY, targetX].SetPositions(targetX, targetY);
+        _pixelArr[targetY, targetX].SetTablePosition(targetX, targetY);
+    }
+
+    public void ChangePixels(int currentX, int currentY, int targetX, int targetY)
+    {
+        Pixel currentPixel = _pixelArr[currentY, currentX];
+        Pixel targetPixel = _pixelArr[targetY, targetX];
+
+        Vector3 targetPos = targetPixel.transform.position;
+        Vector3 currenPos = currentPixel.transform.position;
+
+        // Set current pixel's positions
+        currentPixel.SetPosition(targetPos);
+        currentPixel.SetTablePosition(targetX, targetY);
+
+        // Set target pixel's positions
+        targetPixel.SetPosition(currenPos);
+        targetPixel.SetTablePosition(currentX, currentY);
+
+        // Update pixels positions
+        _pixelArr[currentY, currentX] = targetPixel;
+        _pixelArr[targetY, targetX] = currentPixel;
     }
 }
