@@ -407,6 +407,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pixelPref: {fileID: 369958778473757233, guid: 2b7a7f6fd25befc45b64a2d603a89070, type: 3}
   pixelParent: {fileID: 746177177}
+  pixelSize: 1
   simTableTransform: {fileID: 971527546}
 --- !u!4 &828600623
 Transform:

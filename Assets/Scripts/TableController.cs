@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class TableController : MonoBehaviour
 {
+    [Header("Pixel")]
     [SerializeField] private GameObject pixelPref;
     [SerializeField] private Transform pixelParent;
+    [Range(1, 15)]
+    [SerializeField] private int penSize = 1;
+
+    [Header("Table")]
     [SerializeField] private Transform simTableTransform;
 
     // Default value is 10 and all algorith is calculated according to this assumption
@@ -39,48 +44,130 @@ public class TableController : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Mouse0))
         {
-            Vector2Int tablePos = GetPositionOnTable();
-
-            if (tablePos.y >= _arrY || tablePos.y < 0 || tablePos.x >= _arrX || tablePos.x < 0)
+            foreach(Vector2Int pos in GetPositionsOnTable())
             {
-                return;
-            }
-
-            if (_pixelArr[tablePos.y, tablePos.x] == null)
-            {
-                GameObject go = Instantiate(pixelPref, GetFixedMousePosition(), Quaternion.identity, pixelParent);
-
-                if (go.TryGetComponent(out Pixel pixel))
-                {
-                    pixel.SetPixelData(tablePos.x, tablePos.y, go);
-                    _pixelArr[tablePos.y, tablePos.x] = pixel;
-                }
-                else
-                {
-                    Destroy(go);
-                }
+                PlacePixel(pos);
             }
         }
         else if (Input.GetKey(KeyCode.Mouse1))
         {
-            Vector2Int tablePos = GetPositionOnTable();
-
-            if (tablePos.y >= _arrY || tablePos.y < 0 || tablePos.x >= _arrX || tablePos.x < 0)
+            foreach (Vector2Int pos in GetPositionsOnTable())
             {
-                return;
-            }
-
-            if (_pixelArr[tablePos.y, tablePos.x] != null)
-            {
-                GameObject selectedGo = _pixelArr[tablePos.y, tablePos.x].gameObject;
-                _pixelArr[tablePos.y, tablePos.x] = null;
-
-                Destroy(selectedGo);
+                RemovePixel(pos);
             }
         }
     }
 
     private void FixedUpdate()
+    {
+        ApplyPixelsPhysics();
+    }
+
+    private List<Vector2Int> GetPositionsOnTable()
+    {
+        Vector2Int originPoint = GetPixelsTablePosition();
+        List<Vector2Int> positionList = new List<Vector2Int>();
+
+        for (int i = 0; i < penSize; i++)
+        {
+            for (int j = 0; j < penSize; j++)
+            {
+                // if pixelSize is even then factor equals to pixelSize / 2, else ((pixelSize + 1) / 2) - 1
+                int factor = penSize % 2 == 0 ? penSize / 2 : ((penSize + 1) / 2) - 1;
+
+                positionList.Add(new Vector2Int(originPoint.x - factor + i, originPoint.y - factor + j));
+            }
+        }
+
+        return positionList;
+    }
+
+    private void PlacePixel(Vector2Int selectedPos)
+    {
+        if (selectedPos.y >= _arrY || selectedPos.y < 0 || selectedPos.x >= _arrX || selectedPos.x < 0)
+        {
+            return;
+        }
+
+        if (_pixelArr[selectedPos.y, selectedPos.x] == null)
+        {
+            GameObject go = Instantiate(pixelPref, 
+                                        new Vector3(GetPosByCoordinateValue(selectedPos.x, _arrX), GetPosByCoordinateValue(selectedPos.y, _arrY), 0f), 
+                                        Quaternion.identity, pixelParent);
+
+            if (go.TryGetComponent(out Pixel pixel))
+            {
+                pixel.SetPixelData(selectedPos.x, selectedPos.y, go);
+                _pixelArr[selectedPos.y, selectedPos.x] = pixel;
+            }
+            else
+            {
+                Destroy(go);
+            }
+        }
+    }
+
+    private void RemovePixel(Vector2Int selectedPos)
+    {
+        if (selectedPos.y >= _arrY || selectedPos.y < 0 || selectedPos.x >= _arrX || selectedPos.x < 0)
+        {
+            return;
+        }
+
+        if (_pixelArr[selectedPos.y, selectedPos.x] != null)
+        {
+            GameObject selectedGo = _pixelArr[selectedPos.y, selectedPos.x].gameObject;
+            _pixelArr[selectedPos.y, selectedPos.x] = null;
+
+            Destroy(selectedGo);
+        }
+    }
+
+    private Vector2Int GetPixelsTablePosition()
+    {
+        Vector3 mouseWorldPos = GetMousePosition();
+
+        // We used a 0.1x0.1px sprite as a pixel
+        int posX = (int)(mouseWorldPos.x * simScaleFactor);
+        int posY = (int)(mouseWorldPos.y * simScaleFactor);
+
+        int i = GetCoordinateValueByPos(posX, _arrX);
+        int j = GetCoordinateValueByPos(posY, _arrY);
+
+        return new Vector2Int(i, j);
+    }
+
+    private int GetCoordinateValueByPos(int positionalValue, int arrLength)
+    {
+        int coordValue;
+
+        // I assume that both _arrX and _arrY are odd, else an additional check for oddness and evenness must be added.
+        if (positionalValue < 0)
+        {
+            coordValue = arrLength - Mathf.Abs(positionalValue) - ((arrLength + 1) / 2);
+        }
+        else
+        {
+            coordValue = ((arrLength - 1) / 2) + positionalValue;
+        }
+
+        return coordValue;
+    }
+
+    // Get word position according to index on the table
+    private float GetPosByCoordinateValue(int coordValue, int arrLength)
+    {
+        return (float)(coordValue - ((arrLength - 1) / 2)) / simScaleFactor;
+    }
+
+    private Vector3 GetMousePosition()
+    {
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = 0;
+        return mouseWorldPos;
+    }
+
+    private void ApplyPixelsPhysics()
     {
         for (int j = 0; j < _arrY; j++)
         {
@@ -99,54 +186,7 @@ public class TableController : MonoBehaviour
         }
     }
 
-    private Vector2Int GetPositionOnTable()
-    {
-        Vector3 mouseWorldPos = GetMousePosition();
-
-        // We used a 0.1x0.1px sprite as a pixel
-        int posX = (int)(mouseWorldPos.x * simScaleFactor);
-        int posY = (int)(mouseWorldPos.y * simScaleFactor);
-
-        int i = GetCoordinateValue(posX, _arrX);
-        int j = GetCoordinateValue(posY, _arrY);
-
-        return new Vector2Int(i, j);
-    }
-
-    int GetCoordinateValue(int positionalValue, int arrLength)
-    {
-        int coordValue;
-
-        // I assume that both _arrX and _arrY are odd, else an additional check for oddness and evenness must be added.
-        if (positionalValue < 0)
-        {
-            coordValue = arrLength - Mathf.Abs(positionalValue) - ((arrLength + 1) / 2);
-        }
-        else
-        {
-            coordValue = ((arrLength - 1) / 2) + positionalValue;
-        }
-
-        return coordValue;
-    }
-
-    private Vector3 GetMousePosition()
-    {
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorldPos.z = 0;
-        return mouseWorldPos;
-    }
-
-    private Vector3 GetFixedMousePosition()
-    {
-        // Turns 1.1125 to 1.1 by make some casting, multiplying and dividing
-        Vector3 mouseWorldPos = GetMousePosition();
-        mouseWorldPos.x = (float)((int)(mouseWorldPos.x * simScaleFactor)) / simScaleFactor;
-        mouseWorldPos.y = (float)((int)(mouseWorldPos.y * simScaleFactor)) / simScaleFactor;
-
-        return mouseWorldPos;
-    }
-
+    #region Public Methods
     public void MovePixel(int currentX, int currentY, int targetX, int targetY)
     {
         Vector3 oldPos = _pixelArr[currentY, currentX].transform.position;
@@ -182,4 +222,5 @@ public class TableController : MonoBehaviour
         _pixelArr[currentY, currentX] = targetPixel;
         _pixelArr[targetY, targetX] = currentPixel;
     }
+    #endregion
 }
