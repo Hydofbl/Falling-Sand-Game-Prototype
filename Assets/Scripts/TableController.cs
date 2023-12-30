@@ -23,6 +23,20 @@ public class TableController : MonoBehaviour
 
     public static TableController Instance;
 
+    private void OnEnable()
+    {
+        // Subscribe Event
+        PenManager.Instance.OnPenChanged += HandlePenChange;
+        PenManager.Instance.OnPenSizeChanged += HandlePenSizeChange;
+    }
+
+    private void OnDisable()
+    {
+        // Unsubscribe Event
+        PenManager.Instance.OnPenChanged -= HandlePenChange;
+        PenManager.Instance.OnPenSizeChanged -= HandlePenSizeChange;
+    }
+
     private void Start()
     {
         if (Instance != null && Instance != this)
@@ -44,7 +58,7 @@ public class TableController : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Mouse0))
         {
-            foreach(Vector2Int pos in GetPositionsOnTable())
+            foreach (Vector2Int pos in GetPositionsOnTable())
             {
                 PlacePixel(pos);
             }
@@ -61,6 +75,16 @@ public class TableController : MonoBehaviour
     private void FixedUpdate()
     {
         ApplyPixelsPhysics();
+    }
+
+    private void HandlePenChange(GameObject penPref)
+    {
+        pixelPref = penPref;
+    }
+
+    private void HandlePenSizeChange(int amount)
+    {
+        penSize = amount;
     }
 
     private List<Vector2Int> GetPositionsOnTable()
