@@ -23,13 +23,6 @@ public class TableController : MonoBehaviour
 
     public static TableController Instance;
 
-    private void OnEnable()
-    {
-        // Subscribe Event
-        PenManager.Instance.OnPenChanged += HandlePenChange;
-        PenManager.Instance.OnPenSizeChanged += HandlePenSizeChange;
-    }
-
     private void OnDisable()
     {
         // Unsubscribe Event
@@ -52,12 +45,22 @@ public class TableController : MonoBehaviour
         _arrY = (int)(simTableTransform.localScale.y * simScaleFactor);
 
         _pixelArr = new Pixel[_arrY, _arrX];
+
+        // Subscribe Event
+        PenManager.Instance.OnPenChanged += HandlePenChange;
+        PenManager.Instance.OnPenSizeChanged += HandlePenSizeChange;
     }
 
     void Update()
     {
         if (Input.GetKey(KeyCode.Mouse0))
         {
+            // Check if origin point is not on table
+            if (!IsPointOnTable(GetMousesTablePosition()))
+            {
+                return;
+            }
+
             foreach (Vector2Int pos in GetPositionsOnTable())
             {
                 PlacePixel(pos);
@@ -65,6 +68,12 @@ public class TableController : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.Mouse1))
         {
+            // Check if origin point is not on table
+            if (!IsPointOnTable(GetMousesTablePosition()))
+            {
+                return;
+            }
+
             foreach (Vector2Int pos in GetPositionsOnTable())
             {
                 RemovePixel(pos);
@@ -89,7 +98,7 @@ public class TableController : MonoBehaviour
 
     private List<Vector2Int> GetPositionsOnTable()
     {
-        Vector2Int originPoint = GetPixelsTablePosition();
+        Vector2Int originPoint = GetMousesTablePosition();
         List<Vector2Int> positionList = new List<Vector2Int>();
 
         for (int i = 0; i < penSize; i++)
@@ -108,7 +117,7 @@ public class TableController : MonoBehaviour
 
     private void PlacePixel(Vector2Int selectedPos)
     {
-        if (selectedPos.y >= _arrY || selectedPos.y < 0 || selectedPos.x >= _arrX || selectedPos.x < 0)
+        if (!IsPointOnTable(selectedPos))
         {
             return;
         }
@@ -131,6 +140,16 @@ public class TableController : MonoBehaviour
         }
     }
 
+    private bool IsPointOnTable(Vector2Int selectedPos)
+    {
+        if (selectedPos.y >= _arrY || selectedPos.y < 0 || selectedPos.x >= _arrX || selectedPos.x < 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     private void RemovePixel(Vector2Int selectedPos)
     {
         if (selectedPos.y >= _arrY || selectedPos.y < 0 || selectedPos.x >= _arrX || selectedPos.x < 0)
@@ -147,7 +166,7 @@ public class TableController : MonoBehaviour
         }
     }
 
-    private Vector2Int GetPixelsTablePosition()
+    private Vector2Int GetMousesTablePosition()
     {
         Vector3 mouseWorldPos = GetMousePosition();
 

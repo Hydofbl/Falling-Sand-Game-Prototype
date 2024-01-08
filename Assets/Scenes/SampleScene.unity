@@ -831,7 +831,7 @@ GameObject:
   - component: {fileID: 828600623}
   - component: {fileID: 828600622}
   m_Layer: 0
-  m_Name: PixelController
+  m_Name: TableController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -925,9 +925,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -10
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.09411765}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.92156863}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1862,6 +1862,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2688330169100009120, guid: 94be338c344493045b5b6743007b8ec6, type: 3}
+      propertyPath: PenPixelPrefab
+      value: 
+      objectReference: {fileID: 369958778473757233, guid: 2b7a7f6fd25befc45b64a2d603a89070, type: 3}
     - target: {fileID: 2790912781738221753, guid: 94be338c344493045b5b6743007b8ec6, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -1879,5 +1883,5 @@ SceneRoots:
   - {fileID: 63985138}
   - {fileID: 828600623}
   - {fileID: 1559582799}
-  - {fileID: 1441033145}
   - {fileID: 1827802065}
+  - {fileID: 1441033145}
