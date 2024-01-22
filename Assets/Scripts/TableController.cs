@@ -12,8 +12,12 @@ public class TableController : MonoBehaviour
 
     [Header("Table")]
     [SerializeField] private Transform simTableTransform;
+    // if table's any size is evan, we have to arrange positions of all pixels accordingly
+    private float _tableEvannessFactor = -0.05f;
+    private float _isXEven = 0;
+    private float _isYEven = 0;
 
-    // Default value is 10 and all algorith is calculated according to this assumption
+    // Default value is 10 and all algorithm is calculated according to this assumption
     private int simScaleFactor = 10;
 
     private Pixel[,] _pixelArr;
@@ -43,6 +47,12 @@ public class TableController : MonoBehaviour
 
         _arrX = (int)(simTableTransform.localScale.x * simScaleFactor);
         _arrY = (int)(simTableTransform.localScale.y * simScaleFactor);
+
+        if(_arrX %2 == 0)
+            _isXEven = 1;
+
+        if(_arrY %2 == 0)
+            _isYEven = 1;
 
         _pixelArr = new Pixel[_arrY, _arrX];
 
@@ -105,7 +115,7 @@ public class TableController : MonoBehaviour
         {
             for (int j = 0; j < penSize; j++)
             {
-                // if pixelSize is even then factor equals to pixelSize / 2, else ((pixelSize + 1) / 2) - 1
+                // if penSize is even then the factor is equals to penSize / 2, else ((penlSize + 1) / 2) - 1
                 int factor = penSize % 2 == 0 ? penSize / 2 : ((penSize + 1) / 2) - 1;
 
                 positionList.Add(new Vector2Int(originPoint.x - factor + i, originPoint.y - factor + j));
@@ -125,7 +135,9 @@ public class TableController : MonoBehaviour
         if (_pixelArr[selectedPos.y, selectedPos.x] == null)
         {
             GameObject go = Instantiate(pixelPref, 
-                                        new Vector3(GetPosByCoordinateValue(selectedPos.x, _arrX), GetPosByCoordinateValue(selectedPos.y, _arrY), 0f), 
+                                        new Vector3(GetPosByCoordinateValue(selectedPos.x, _arrX) + (_isXEven * _tableEvannessFactor), 
+                                                    GetPosByCoordinateValue(selectedPos.y, _arrY) + (_isYEven * _tableEvannessFactor), 
+                                                    0f), 
                                         Quaternion.identity, pixelParent);
 
             if (go.TryGetComponent(out Pixel pixel))
